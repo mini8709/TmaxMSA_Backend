@@ -1,7 +1,9 @@
+server:
+  port: 8082
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5433/msa_hr_db
+    url: jdbc:postgresql://localhost:54321/msa_hr_db
     username: msa_user
     password: msa_password
 

@@ -5,7 +5,7 @@ services:
     container_name: msa_finance_db
     image: postgres:9.3
     ports:
-      - "5432:5432"
+      - "54320:5432"
     environment:
       POSTGRES_DB: "msa_finance_db"
       POSTGRES_USER: "msa_user"
@@ -15,7 +15,7 @@ services:
     container_name: msa_hr_db
     image: postgres:9.3
     ports:
-      - "5433:5432"
+      - "54321:5432"
     environment:
       POSTGRES_DB: "msa_hr_db"
       POSTGRES_USER: "msa_user"
@@ -25,7 +25,7 @@ services:
     container_name: msa_example_db
     image: postgres:9.3
     ports:
-      - "5434:5432"
+      - "54322:5432"
     environment:
       POSTGRES_DB: "msa_example_db"
       POSTGRES_USER: "msa_user"
