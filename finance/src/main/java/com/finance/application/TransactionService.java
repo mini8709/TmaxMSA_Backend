@@ -26,8 +26,8 @@ public class TransactionService {
 
     }
 
-
     public List<TxListResponseDto> findAllTx(){
+
         return this.transactionsPort.findAll();
     }
 
