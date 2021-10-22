@@ -5,6 +5,7 @@ import com.finance.application.spi.SlipPort;
 import com.finance.application.spi.TransactionsPort;
 import com.finance.domain.enums.DCType;
 import com.finance.domain.exceptions.BadRequestException;
+import com.finance.domain.exceptions.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,22 +26,28 @@ public class SlipService {
     @Transactional
     public SlipCreateResponseDto create(SlipCreateRequestDto SlipCreateRequestDto) {
 
-        Optional<TxResponseDto> TxResponseDto = this.transactionsPort.findById(SlipCreateRequestDto.getTx_id());
+        Optional<TxResponseDto> txResponseDto = this.transactionsPort.findById(SlipCreateRequestDto.getTx_id());
 
-        Integer sum_credit = SlipCreateRequestDto.getSlipRequestDtoList().stream().filter(s -> s.getDcType() == DCType.CREDIT).map(s -> s.getAmount()).reduce(0, Integer::sum);
-        Integer sum_debit = SlipCreateRequestDto.getSlipRequestDtoList().stream().filter(s -> s.getDcType() == DCType.DEBIT).map(s -> s.getAmount()).reduce(0, Integer::sum);
+        int sum_credit = SlipCreateRequestDto.getSlipRequestDtoList().stream()
+                .filter(s -> s.getDcType() == DCType.CREDIT).map(s -> s.getAmount()).reduce(0, Integer::sum);
+        int sum_debit = SlipCreateRequestDto.getSlipRequestDtoList().stream()
+                .filter(s -> s.getDcType() == DCType.DEBIT).map(s -> s.getAmount()).reduce(0, Integer::sum);
+        int tx_amount = txResponseDto.get().getTxAmount();
 
-        if (sum_credit == sum_debit) {
-            return slipPort.create(SlipCreateRequestDto, TxResponseDto);
-        }
-        else {
-            throw new com.finance.domain.exceptions.BadRequestException("Invalid Credit Debit Matching");
+        if(sum_credit != sum_debit) {
+            throw new BadRequestException(ErrorCode.DEBIT_CREDIT_NOT_MATCH,
+                    "Credit & Debit Are Not Matched" + sum_credit + ", " + sum_debit);
+        } else if(sum_credit != tx_amount) {
+            throw new BadRequestException(ErrorCode.TRANSACTION_SLIP_NOT_MATCH,
+                    "Transaction & Slips Are Not Matched" + sum_credit + ", " + tx_amount);
+        } else {
+            return slipPort.create(SlipCreateRequestDto, txResponseDto);
         }
     }
 
     public SlipSingleResponseDto findSlipById(String id) {
         return this.slipPort.findById(id).orElseThrow(
-                () -> new BadRequestException("Invalid Slip Id")
+                () -> new BadRequestException(ErrorCode.ROW_DOES_NOT_EXIST, "Invalid Slip Id: " + id)
         );
 
     }

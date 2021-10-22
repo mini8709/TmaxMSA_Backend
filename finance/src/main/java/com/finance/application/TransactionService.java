@@ -5,6 +5,7 @@ import com.finance.application.dto.TxListResponseDto;
 import com.finance.application.dto.TxResponseDto;
 import com.finance.application.spi.TransactionsPort;
 import com.finance.domain.exceptions.BadRequestException;
+import com.finance.domain.exceptions.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,7 @@ public class TransactionService {
 
     public TxResponseDto findTxById(String id){
         return this.transactionsPort.findById(id).orElseThrow(
-                () -> new BadRequestException("Invalid Transaction Id")
+                () -> new BadRequestException(ErrorCode.ROW_DOES_NOT_EXIST, "Invalid Transaction Id: " + id)
         );
     }
 
